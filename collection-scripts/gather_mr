@@ -3,9 +3,7 @@
 source common.sh
 resources=("modelregistries.modelregistry.opendatahub.io")
 # Dependent resources ossm
-resources+=("smcp" "smm" "smmr" "authorizationpolicies" "destinationrules" "gateways" "virtualservices")
-# Dependent resources authorino
-resources+=("authconfigs" "authorinos")
+resources+=("authorizationpolicies" "destinationrules" "gateways" "virtualservices")
 
 nslist=$(get_all_namespace "${resources[@]}")
 
