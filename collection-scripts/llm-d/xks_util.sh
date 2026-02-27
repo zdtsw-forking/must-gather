@@ -11,6 +11,7 @@ function auto_discover_resources() {
         ns_flag="-n ${namespace}"
     fi
 
+    # shellcheck disable=SC2086
     while IFS= read -r line; do
         local resource_name
         local api_version
@@ -19,7 +20,6 @@ function auto_discover_resources() {
         [[ -z "$resource_name" ]] && continue # handle warning line
 
         # Check if any resources of this type exist
-        # shellcheck disable=SC2086
         if ! $KUBECTL get "$resource_name" $ns_flag --no-headers 2>/dev/null | grep -q .; then
             continue  # skip if not exist
         fi
@@ -79,7 +79,9 @@ function kubectl_inspect() {
             # Get logs for each container
             for container in $($KUBECTL get pod "$pod" -n "$namespace" -o jsonpath='{.spec.containers[*].name}' 2>/dev/null); do
                 mkdir -p "${pod_dir}/${container}/logs"
+                # shellcheck disable=SC2086,SC2154
                 $KUBECTL logs "$pod" -n "$namespace" -c "$container" $log_collection_args > "${pod_dir}/${container}/logs/current.log" 2>/dev/null || true
+                # shellcheck disable=SC2086
                 $KUBECTL logs "$pod" -n "$namespace" -c "$container" --previous $log_collection_args > "${pod_dir}/${container}/logs/previous.log" 2>/dev/null || true
             done
         done
@@ -130,9 +132,10 @@ function detect_k8s_distro() {
         exit 1
     fi
 
-    local kernel_version=$(${cmd} get nodes -o jsonpath='{.items[0].status.nodeInfo.kernelVersion}' 2>/dev/null) # for CKS
-    local os_image=$(${cmd} get nodes -o jsonpath='{.items[0].status.nodeInfo.osImage}' 2>/dev/null)  # for OCP
-    local provider_id=$(${cmd} get nodes -o jsonpath='{.items[0].spec.providerID}' 2>/dev/null) # for AKS
+    local kernel_version os_image provider_id
+    kernel_version=$(${cmd} get nodes -o jsonpath='{.items[0].status.nodeInfo.kernelVersion}' 2>/dev/null) # for CKS
+    os_image=$(${cmd} get nodes -o jsonpath='{.items[0].status.nodeInfo.osImage}' 2>/dev/null)  # for OCP
+    provider_id=$(${cmd} get nodes -o jsonpath='{.items[0].spec.providerID}' 2>/dev/null) # for AKS
 
     # Check for OpenShift first (catches ROSA and ARO)
     if echo "$os_image" | grep -q "Red Hat Enterprise Linux CoreOS"; then
