@@ -1,3 +1,4 @@
+#!/bin/bash
 # Common auto-discovery function for both namespaced and cluster-scoped resources
 function auto_discover_resources() {
     local namespaced="$1"
@@ -11,11 +12,14 @@ function auto_discover_resources() {
     fi
 
     while IFS= read -r line; do
-        local resource_name=$(echo "$line" | awk '{print $1}')
-        local api_version=$(echo "$line" | awk '{print $3}')
+        local resource_name
+        local api_version
+        resource_name=$(echo "$line" | awk '{print $1}')
+        api_version=$(echo "$line" | awk '{print $3}')
         [[ -z "$resource_name" ]] && continue # handle warning line
 
         # Check if any resources of this type exist
+        # shellcheck disable=SC2086
         if ! $KUBECTL get "$resource_name" $ns_flag --no-headers 2>/dev/null | grep -q .; then
             continue  # skip if not exist
         fi

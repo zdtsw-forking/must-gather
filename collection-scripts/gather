@@ -132,7 +132,7 @@ case "$component" in
         /usr/bin/gather_mlflow
         ;;
     "llm-d")
-        $(dirname "$0")/llm-d/gather_llmd.sh
+        "$(dirname "$0")/llm-d/gather_llmd.sh"
         # WVA is optional, controlled by ENABLE_WVA env var (default: false)
         if [[ "${ENABLE_WVA:-false}" == "true" ]]; then
             /usr/bin/llm-d/gather_wva.sh

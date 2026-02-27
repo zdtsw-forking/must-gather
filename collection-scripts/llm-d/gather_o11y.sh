@@ -33,9 +33,9 @@ if [[ "${K8S_DISTRO}" == "aks" && "${AKS_MONITORING_TYPE}" == "managed" ]]; then
         # Get logs for each container
         for container in $($KUBECTL get pod "$pod" -n "${AMA_NS}" -o jsonpath='{.spec.containers[*].name}' 2>/dev/null); do
             mkdir -p "${pod_dir}/${container}/logs"
-            # shellcheck disable=SC2086
+            # shellcheck disable=SC2086,SC2154
             $KUBECTL logs "$pod" -n "${AMA_NS}" -c "$container" $log_collection_args > "${pod_dir}/${container}/logs/current.log" 2>/dev/null
-            # shellcheck disable=SC2086
+            # shellcheck disable=SC2086,SC2154
             $KUBECTL logs "$pod" -n "${AMA_NS}" -c "$container" --previous $log_collection_args > "${pod_dir}/${container}/logs/previous.log" 2>/dev/null
         done
     done
